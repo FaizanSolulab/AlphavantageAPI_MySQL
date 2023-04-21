@@ -75,7 +75,6 @@ export const registerUser = async (req: any, res: any) => {
             password: hashedPassword,
           });
 
-        logger.info(`User successfully created: ${[userCreate]}`);
 
         const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
         await dbConnection.promise().query("INSERT INTO otp SET ?", {

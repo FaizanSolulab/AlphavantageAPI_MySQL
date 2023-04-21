@@ -1,5 +1,4 @@
 import express from "express";
-import { body } from "express-validator";
 import { registerUser } from "../controllers/auth";
 import { verifyOtp } from "../controllers/auth";
 
