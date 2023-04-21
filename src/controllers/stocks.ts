@@ -96,22 +96,32 @@ const getStocks = async (req: any, res: any) => {
 const fetchStockDataForAllSymbols = async () => {
   logger.info('Inside fetchStockDataForAllSymbols')
   try{
-    const [usersRow]:any = await dbConnection.promise().query('SELECT * users');
+    const [usersRow]:any = await dbConnection.promise().query('SELECT * FROM users');
+    console.log("usersRow", usersRow)
     const users = usersRow[0];
-    for(const user of users){
-      const searchedSymbols = user.searchedSymbols;
-      for(const symbol of searchedSymbols){
-        const stocks = await fetchStockData(symbol);
-  
-        if(!stocks){
-          logger.error('No symbols in db or failed to fetch data')
+    console.log("users", users)
+      for(const userRow of usersRow){
+        const searchedSymbols = [...new Set(userRow.searchedSymbols)];
+        console.log("searchedSymbols", searchedSymbols)
+        if(searchedSymbols && searchedSymbols.length > 0){
+          for(const symbol of searchedSymbols){
+            const stocks = await fetchStockData(symbol);
+            console.log("stocks", stocks)
+      
+            if(!stocks){
+              logger.error('No symbols in db or failed to fetch data')
+            
+
+        } else{
+
+          const [updatedStocks] = await dbConnection.promise().query('UPDATE stocks SET stockData = ? WHERE symbol = ?', [JSON.stringify(stocks), symbol]);
         }
-
-
-        const [updatedStocks] = await dbConnection.promise().query('UPDATE stocks SET data = ? RETURNING *', [JSON.stringify(stocks)]);
+  
+  
+            
+          }
           
-        };
-        
+        }
       }
     
   } catch(error){
